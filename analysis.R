@@ -7,7 +7,7 @@ local({r <- getOption("repos")
 # Install/load required packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tm, topicmodels, dplyr, tidyr, igraph, devtools, LDAvis,
-               ggplot2, quanteda, parallel)
+               ggplot2, quanteda, parallel, rlist)
 if (!require("cldr",character.only = TRUE)){
     url <- "http://cran.us.r-project.org/src/contrib/Archive/cldr/cldr_1.1.0.tar.gz"
     pkgFile<-"cldr_1.1.0.tar.gz"
@@ -67,18 +67,42 @@ for(f in fechas){
 }
 
 
-# Create corpus
+# Create corpus and subset them into spanish and english corpus
 ############################################
 corpus.all <- corpus(tuits, text_field = "Texto")
+corpus.english <- corpus_subset(corpus.all, lang == "ENGLISH")
 
 
+# Create DTMs
+############################################
+myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.co")
+dtm.english <- dfm(corpus.english, remove = c(stopwords("english"), myStopWords),
+                   groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
+                   removeNumbers = TRUE)
 
-# Create DTM for english tuits
-myStopWords <- c("trump", "donald", "realdonaldtrump", "amp")
-dtm.english <- dfm() 
+# Filter words smaller than 4 chars
+###########################################
+features <- featnames(dtm.english)
+feat_rem <- sapply(features, function(i) nchar(i) <= 3)
+features <- features[!feat_rem]
+dtm.english <- dfm_select(dtm.english, features = features, selection = "keep",
+                          valuetype = "fixed")
 
-
-
+                                        # Wordclouds
+###########################################
+set.seed(100)
+cont <- 1
+for(name in docnames(dtm.english)){
+    f.name <- paste("english", "wordcloud", name, sep = "_")
+    f.name <- paste(f.name,"png", sep = ".")
+    f.name <- paste("img", f.name, sep = "/")
+    png(f.name, width=1280,height=800)
+    textplot_wordcloud(dtm.english[cont,], max.words = 150, random.order = FALSE,
+                   rot.per = .25, 
+                   colors = RColorBrewer::brewer.pal(8,"Dark2"))
+    dev.off()
+    cont <- cont + 1
+}
 
 
 

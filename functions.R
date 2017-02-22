@@ -1,7 +1,7 @@
 #' Format date.
 #' 
 #' @param s A string with format 2016-10-11T11:58:09.000Z.
-#' @return The sum of \code{x} and \code{y}.formatted string 2016-10-11 11.58.09.000Z 
+#' @return The formatted string 2016-10-11 11.58.09.000Z 
 #' @examples
 #' ftime(2016-10-11T11:58:09.000Z)
 ftime <- function(s){

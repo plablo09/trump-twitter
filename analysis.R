@@ -47,6 +47,38 @@ print("Classifying languages")
 tuits$lang <- parLapply(cl,tuits$Texto,parseDetectLanguage)
 tuits$lang <- as.character(tuits$lang)
 
+# Add column identifying date slice
+fechas = c("2014-04-03","2015-06-16","2015-06-25","2015-06-30",
+           "2015-07-06","2015-07-23","2015-12-07" ,"2016-05-03",
+           "2016-07-18","2016-07-25", "2016-08-26","2016-08-31",
+           "2016-09-01","2016-10-03","2016-10-07","2016-10-08",
+           "2016-10-10","2016-10-15","2016-10-19","2016-11-09")
+cont <- 1
+tuits$slice <- NA
+for(f in fechas){
+    if(cont < length(fechas)){
+        d <- as.Date(f)
+        index <- tuits$fecha >= d & tuits$fecha <= as.Date(fechas[[cont + 1]])
+        if(nrow(tuits[index,]) > 0){
+            tuits[index,]["slice"] <- f
+        }        
+    }
+    cont <- cont +1
+}
+
+
 # Create corpus
 ############################################
 corpus.all <- corpus(tuits, text_field = "Texto")
+
+
+
+# Create DTM for english tuits
+myStopWords <- c("trump", "donald", "realdonaldtrump", "amp")
+dtm.english <- dfm() 
+
+
+
+
+
+

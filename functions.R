@@ -9,7 +9,7 @@ ftime <- function(s){
   s = gsub("T", " ", s)
 }
 
-#' Detect a string languga.
+#' Detect a string language.
 #' 
 #' @param s A string.
 #' @return The language deteced by cldr or NULL if language couldn't be detected

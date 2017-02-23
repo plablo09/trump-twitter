@@ -80,6 +80,12 @@ dtm.english <- dfm(corpus.english, remove = c(stopwords("english"), myStopWords)
                    groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
                    removeNumbers = TRUE)
 
+# Filter out urls
+## dtm.english <- dfm_select(dtm.english, features = "http[[:alnum:]]*",
+##                           selection = "remove", valuetype = "regex")
+
+
+
 # Filter words smaller than 4 chars
 ###########################################
 features <- featnames(dtm.english)
@@ -88,15 +94,15 @@ features <- features[!feat_rem]
 dtm.english <- dfm_select(dtm.english, features = features, selection = "keep",
                           valuetype = "fixed")
 
-                                        # Wordclouds
+# Wordclouds
 ###########################################
 set.seed(100)
 cont <- 1
 for(name in docnames(dtm.english)){
     f.name <- paste("english", "wordcloud", name, sep = "_")
-    f.name <- paste(f.name,"png", sep = ".")
+    f.name <- paste(f.name,"pdf", sep = ".")
     f.name <- paste("img", f.name, sep = "/")
-    png(f.name, width=1280,height=800)
+    pdf(f.name)
     textplot_wordcloud(dtm.english[cont,], max.words = 150, random.order = FALSE,
                    rot.per = .25, 
                    colors = RColorBrewer::brewer.pal(8,"Dark2"))

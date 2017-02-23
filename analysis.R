@@ -7,7 +7,7 @@ local({r <- getOption("repos")
 # Install/load required packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tm, topicmodels, dplyr, tidyr, igraph, devtools, LDAvis,
-               ggplot2, quanteda, parallel, rlist)
+               ggplot2, quanteda, parallel, rlist, ldatuning)
 if (!require("cldr",character.only = TRUE)){
     url <- "http://cran.us.r-project.org/src/contrib/Archive/cldr/cldr_1.1.0.tar.gz"
     pkgFile<-"cldr_1.1.0.tar.gz"
@@ -110,5 +110,6 @@ for(name in docnames(dtm.english)){
     cont <- cont + 1
 }
 
+# Find optimal K for LDA topicmodel
 
 

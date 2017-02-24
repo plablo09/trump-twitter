@@ -7,7 +7,7 @@ local({r <- getOption("repos")
 # Install/load required packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tm, topicmodels, dplyr, tidyr, igraph, devtools, LDAvis,
-               ggplot2, quanteda, parallel, rlist, ldatuning)
+               ggplot2, quanteda, parallel, rlist, ldatuning, magrittr, reshape)
 if (!require("cldr",character.only = TRUE)){
     url <- "http://cran.us.r-project.org/src/contrib/Archive/cldr/cldr_1.1.0.tar.gz"
     pkgFile<-"cldr_1.1.0.tar.gz"
@@ -111,5 +111,32 @@ for(name in docnames(dtm.english)){
 }
 
 # Find optimal K for LDA topicmodel
+##########################################
+control <- list(burnin = 500, iter = 1000, keep = 100, seed = 2500)
+result <- FindTopicsNumber(
+  dtm.english,
+  topics = seq(from = 2, to = 50, by = 2),
+  metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"),
+  method = "Gibbs",
+  control = control,
+  mc.cores = 5L,
+  verbose = TRUE
+)
+pdf("img/optimal-K.pdf")
+FindTopicsNumber_plot(result)
+dev.off()
 
+# Fit model with found optimal K
+##########################################
+optimaLDA <- LDA(dtm.english, 8, method = "Gibbs", control = control)
 
+# Plot topic proportions per time slice
+##########################################
+topics <- posterior(optimaLDA, dtm.english)$topics
+topic_dat <- add_rownames(as.data.frame(topics), "Time")
+colnames(topic_dat)[-1] <- apply(terms(optimaLDA, 8), 2, paste, collapse = ", ")
+gathered <- gather(topic_dat, Topic, Proportion, -c(Time))
+melted <- melt(gathered, id=c("Time","Topic"))
+sp <- ggplot(melted, aes(weight=value, x=Topic, fill=value))
+sp + geom_bar() + coord_flip()
+sp + facet_wrap(~ Time, scale = "free_X")

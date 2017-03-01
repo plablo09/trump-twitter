@@ -151,3 +151,8 @@ sp <- sp + theme(axis.text=element_text(size=4),
 pdf("img/time_topics.pdf")
 sp
 dev.off()
+
+jsonVis <- topicmodels2LDAvis(optimaLDA)
+
+## Serve visualization with:
+## LDAvis::serVis(jsonVis)

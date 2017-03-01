@@ -20,7 +20,7 @@ library(cldr)
 
 # Read functions
 ############################################
-funcs <- c("ftime","parseDetectLanguage")
+funcs <- c("ftime","parseDetectLanguage", "topicmodels2LDAvis")
 for(f in funcs){
     if(!exists(f, mode="function")) source("functions.R")
 }
@@ -82,12 +82,6 @@ dtm.english <- dfm(corpus.english, remove = c(stopwords("english"), myStopWords)
                    groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
                    removeNumbers = TRUE)
 
-# Filter out urls
-## dtm.english <- dfm_select(dtm.english, features = "http[[:alnum:]]*",
-##                           selection = "remove", valuetype = "regex")
-
-
-
 # Filter words smaller than 4 chars
 ###########################################
 features <- featnames(dtm.english)
@@ -124,6 +118,10 @@ result <- FindTopicsNumber(
   mc.cores = 5L,
   verbose = TRUE
 )
+save(result, file =  "data/ldatunin_result.RData")
+
+
+
 pdf("img/optimal-K.pdf")
 FindTopicsNumber_plot(result)
 dev.off()

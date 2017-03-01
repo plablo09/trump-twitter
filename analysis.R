@@ -20,7 +20,7 @@ library(cldr)
 
 # Read functions
 ############################################
-funcs <- c("ftime","parseDetectLanguage", "topicmodels2LDAvis")
+funcs <- c("ftime","parseDetectLanguage", "topicmodels2LDAvis", "colMax", "colMin")
 for(f in funcs){
     if(!exists(f, mode="function")) source("functions.R")
 }
@@ -119,8 +119,27 @@ result <- FindTopicsNumber(
   verbose = TRUE
 )
 save(result, file =  "data/ldatunin_result.RData")
+result$rankArun <- ave(result$Arun2010,
+                                      FUN=function(x) rank(x,ties.method="min"))
+minArun <- subset(result, rankArun==1)$topics
 
+result$rankCao <- ave(result$CaoJuan2009,
+                                      FUN=function(x) rank(x,ties.method="min"))
+minCao <- subset(result, rankCao==1)$topics
 
+result$rankGriffiths <- ave(-result$Griffiths2004,
+                                      FUN=function(x) rank(x,ties.method="min"))
+maxGriffiths <- subset(result, rankGriffiths==1)$topics
+
+result$rankDeveaud <- ave(-result$Deveaud2014,
+                                      FUN=function(x) rank(x,ties.method="min"))
+maxDeveaud <- subset(result, rankDeveaud==1)$topics
+
+candidates <- c(minArun, minCao, maxGriffiths, maxDeveaud)
+
+# We are going to use the median as the representative value  
+# though this must be revised
+K <- median(candidates)
 
 pdf("img/optimal-K.pdf")
 FindTopicsNumber_plot(result)
@@ -128,7 +147,7 @@ dev.off()
 
 # Fit model with found optimal K
 ##########################################
-optimaLDA <- LDA(dtm.english, 10, method = "Gibbs", control = control)
+optimaLDA <- LDA(dtm.english, K, method = "Gibbs", control = control)
 
 # Plot topic proportions per time slice
 ##########################################

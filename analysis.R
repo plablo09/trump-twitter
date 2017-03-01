@@ -129,7 +129,7 @@ dev.off()
 
 # Fit model with found optimal K
 ##########################################
-optimaLDA <- LDA(dtm.english, 8, method = "Gibbs", control = control)
+optimaLDA <- LDA(dtm.english, 10, method = "Gibbs", control = control)
 
 # Plot topic proportions per time slice
 ##########################################
@@ -137,7 +137,6 @@ topics <- posterior(optimaLDA, dtm.english)$topics
 topic_dat <- add_rownames(as.data.frame(topics), "Time")
 colnames(topic_dat)[-1] <- apply(terms(optimaLDA, 8), 2, paste, collapse = ", ")
 gathered <- gather(topic_dat, Topic, Proportion, -c(Time))
-#melted <- melt(gathered, id=c("Topic","Time"))
 t_levels <- c("2014-04-03", "2015-07-06", "2015-07-23", "2015-12-07", "2016-05-03",
                  "2016-07-18", "2016-07-25", "2016-08-26", "2016-08-31", "2016-09-01",
                  "2016-10-03", "2016-10-07", "2016-10-08", "2016-10-10", "2016-10-15",
@@ -145,17 +144,10 @@ t_levels <- c("2014-04-03", "2015-07-06", "2015-07-23", "2015-12-07", "2016-05-0
 mut <- mutate(gathered, Time = factor(Time, levels = t_levels))
 sp <- ggplot(mut, aes(weight=Proportion, x=Topic, fill=Topic))
 sp <- sp + geom_bar() + coord_flip()
-sp <- sp + facet_grid(Time ~ .) + guides(fill=FALSE)
+sp <- sp + facet_wrap(~Time) + guides(fill=FALSE) + ylab("Proportion")
+sp <- sp + theme(axis.text=element_text(size=4),
+                 axis.title=element_text(size=8,face="bold"),
+                 strip.text = element_text(size=4))
+pdf("img/time_topics.pdf")
 sp
-
-
-## dos <- gathered[gathered$Time == "2015-12-07" | gathered$Time == "2016-05-03",]
-## dos <- mutate(dos, Time = factor(Time, levels = c("2015-12-07", "2016-05-03")))
-## dos_sp <- ggplot(dos, aes(weight=Proportion,x=Topic,fill=Topic))
-## dos_sp + geom_bar()
-## dos_sp + facet_grid(Time ~ .) + guides(fill=FALSE)
-
-## dos_sp <- ggplot(t, aes(weight=Proportion,x=Topic,fill=Topic))
-## dos_sp <-dos_sp + geom_bar() + coord_flip() + guides(fill=FALSE)
-## dos_sp <-dos_sp + facet_grid(Time ~ .) + guides(fill=FALSE)
-## dos_sp
+dev.off()

@@ -121,3 +121,33 @@ getOptimalK <- function(result){
     return(median(candidates))
 
 }
+
+
+#' Plot per document topic proportions plots.
+#' 
+#' @param posterior The posterior distribution of a fitted LDA model.
+#' @param lda The \pkg{topicmodels} fitted topicmodel
+#' @param documents A list with the document names
+#' @param language A string with the language of the documents (just for file naming)
+#' @param basePath Where should I save the plot
+#' @return The ggplot object
+#' @examples
+#' t_levels <- c("2014-04-03", "2015-07-06", "2015-07-23", "2015-12-07", "2016-05-03",
+#'                 "2016-07-18", "2016-07-25", "2016-08-26", "2016-08-31", "2016-09-01",
+#'                 "2016-10-03", "2016-10-07", "2016-10-08", "2016-10-10", "2016-10-15",
+#'              "2016-10-19")
+
+#' plotProportions(posterior, lda.english, t_levels, "english", "img")
+plotProportions <- function(posterior, lda,  documents, language, basePath){
+    topic_dat <- add_rownames(as.data.frame(posterior), "Time")
+    colnames(topic_dat)[-1] <- apply(terms(lda, 8), 2, paste, collapse = ", ")
+    gathered <- gather(topic_dat, Topic, Proportion, -c(Time))
+    mut <- mutate(gathered, Time = factor(Time, levels = documents))
+    sp <- ggplot(mut, aes(weight=Proportion, x=Topic, fill=Topic))
+    sp <- sp + geom_bar() + coord_flip()
+    sp <- sp + facet_wrap(~Time) + guides(fill=FALSE) + ylab("Proportion")
+    sp <- sp + theme(axis.text=element_text(size=4),
+                     axis.title=element_text(size=8,face="bold"),
+                     strip.text = element_text(size=4))
+    return(sp)
+}

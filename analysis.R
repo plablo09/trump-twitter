@@ -155,7 +155,7 @@ pdf("img/english_topic_proportions.pdf")
 sp
 dev.off()
 topics.spanish <- posterior(lda.spanish, dtm.spanish)$topics
-plotProportions(topics.english, lda.spanish, t_levels, "english", "img")
+sp <- plotProportions(topics.spanish, lda.spanish, t_levels, "spanish", "img")
 pdf("img/spanish_topic_proportions.pdf")
 sp
 dev.off()

@@ -77,7 +77,7 @@ corpus.english <- corpus_subset(corpus.all, lang == "ENGLISH")
 # Create DTMs
 ############################################
 myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.co",
-                 "iuglihzqy8", "4aimcj740l")
+                 "iuglihzqy8", "4aimcj740l", "aswafbjtet", "tmjr7gwqze",)
 dtm.english <- dfm(corpus.english, remove = c(stopwords("english"), myStopWords),
                    groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
                    removeNumbers = TRUE)

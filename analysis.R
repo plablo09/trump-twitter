@@ -20,7 +20,8 @@ library(cldr)
 
 # Read functions
 ############################################
-funcs <- c("ftime","parseDetectLanguage", "topicmodels2LDAvis", "colMax", "colMin")
+funcs <- c("ftime","parseDetectLanguage", "topicmodels2LDAvis", "filterByLength",
+           "saveWordclouds", "getOptimalK")
 for(f in funcs){
     if(!exists(f, mode="function")) source("functions.R")
 }
@@ -72,6 +73,7 @@ for(f in fechas){
 ############################################
 corpus.all <- corpus(tuits, text_field = "Texto")
 corpus.english <- corpus_subset(corpus.all, lang == "ENGLISH")
+corpus.spanish <- corpus_subset(corpus.all, lang == "SPANISH")
 
 
 # Create DTMs
@@ -81,35 +83,26 @@ myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.
 dtm.english <- dfm(corpus.english, remove = c(stopwords("english"), myStopWords),
                    groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
                    removeNumbers = TRUE)
+dtm.spanish <- dfm(corpus.spanish, remove = c(stopwords("spanish"), myStopWords),
+                   groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
+                   removeNumbers = TRUE)
+
 
 # Filter words smaller than 4 chars
 ###########################################
-features <- featnames(dtm.english)
-feat_rem <- sapply(features, function(i) nchar(i) <= 3)
-features <- features[!feat_rem]
-dtm.english <- dfm_select(dtm.english, features = features, selection = "keep",
-                          valuetype = "fixed")
+dtm.english <- filterByLength(dtm.english, 3)
+dtm.spanish <- filterByLength(dtm.spanish, 3)
 
 # Wordclouds
 ###########################################
 set.seed(100)
-cont <- 1
-for(name in docnames(dtm.english)){
-    f.name <- paste("english", "wordcloud", name, sep = "_")
-    f.name <- paste(f.name,"pdf", sep = ".")
-    f.name <- paste("img", f.name, sep = "/")
-    pdf(f.name)
-    textplot_wordcloud(dtm.english[cont,], max.words = 150, random.order = FALSE,
-                   rot.per = .25, 
-                   colors = RColorBrewer::brewer.pal(8,"Dark2"))
-    dev.off()
-    cont <- cont + 1
-}
+saveWordclouds(dtm.english, 150, "english", "img/")
+saveWordclouds(dtm.spanish, 150, "spanish", "img/")
 
 # Find optimal K for LDA topicmodel
 ##########################################
 control <- list(burnin = 500, iter = 1000, keep = 100, seed = 2500)
-result <- FindTopicsNumber(
+result.english <- FindTopicsNumber(
   dtm.english,
   topics = seq(from = 2, to = 50, by = 2),
   metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"),
@@ -118,36 +111,36 @@ result <- FindTopicsNumber(
   mc.cores = 5L,
   verbose = TRUE
 )
-save(result, file =  "data/ldatunin_result.RData")
-result$rankArun <- ave(result$Arun2010,
-                                      FUN=function(x) rank(x,ties.method="min"))
-minArun <- subset(result, rankArun==1)$topics
+result.spanish <- FindTopicsNumber(
+  dtm.spanish,
+  topics = seq(from = 2, to = 50, by = 2),
+  metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"),
+  method = "Gibbs",
+  control = control,
+  mc.cores = 5L,
+  verbose = TRUE
+)
+save(result.spanish, file =  "data/ldatuning_result_spanish.RData")
+save(result, file =  "data/ldatuning_result_english.RData")
+## Get the optimal K value for each dtm
+###########################################
+K.english <- getOptimalK(result.english)
+K.spanish <- getOptimalK(result.spanish)
 
-result$rankCao <- ave(result$CaoJuan2009,
-                                      FUN=function(x) rank(x,ties.method="min"))
-minCao <- subset(result, rankCao==1)$topics
-
-result$rankGriffiths <- ave(-result$Griffiths2004,
-                                      FUN=function(x) rank(x,ties.method="min"))
-maxGriffiths <- subset(result, rankGriffiths==1)$topics
-
-result$rankDeveaud <- ave(-result$Deveaud2014,
-                                      FUN=function(x) rank(x,ties.method="min"))
-maxDeveaud <- subset(result, rankDeveaud==1)$topics
-
-candidates <- c(minArun, minCao, maxGriffiths, maxDeveaud)
-
-# We are going to use the median as the representative value  
-# though this must be revised
-K <- median(candidates)
-
-pdf("img/optimal-K.pdf")
-FindTopicsNumber_plot(result)
+## Save metrics plots for both languages
+pdf("img/optimal-K-english.pdf")
+FindTopicsNumber_plot(result.english)
+dev.off()
+pdf("img/optimal-K-spanish.pdf")
+FindTopicsNumber_plot(result.spanish)
 dev.off()
 
-# Fit model with found optimal K
+# Fit models with found optimal Ks and save them
 ##########################################
-optimaLDA <- LDA(dtm.english, K, method = "Gibbs", control = control)
+lda.english <- LDA(dtm.english, K.english, method = "Gibbs", control = control)
+lda.spanish <- LDA(dtm.spanish, K.spanish, method = "Gibbs", control = control)
+save(lda.english, file = "lda.english.RData")
+save(lda.spanish, file = "lda.spanish.RData")
 
 # Plot topic proportions per time slice
 ##########################################

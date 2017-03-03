@@ -108,7 +108,7 @@ result.english <- FindTopicsNumber(
   metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"),
   method = "Gibbs",
   control = control,
-  mc.cores = 5L,
+  mc.cores = no_cores,
   verbose = TRUE
 )
 result.spanish <- FindTopicsNumber(
@@ -117,7 +117,7 @@ result.spanish <- FindTopicsNumber(
   metrics = c("Griffiths2004", "CaoJuan2009", "Arun2010", "Deveaud2014"),
   method = "Gibbs",
   control = control,
-  mc.cores = 5L,
+  mc.cores = no_cores,
   verbose = TRUE
 )
 save(result.spanish, file =  "data/ldatuning_result_spanish.RData")

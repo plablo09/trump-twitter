@@ -1,3 +1,15 @@
+#!/usr/bin/env Rscript
+
+# Read command line args
+args = commandArgs(trailingOnly=TRUE)
+
+# if no command line args, use test database
+if(length(args)==0){
+    data_file <- "data/tuits_sample.csv"
+} else{
+    data_file <- args[1]
+}
+
 # Set repo
 local({r <- getOption("repos")
        r["CRAN"] <- "http://cran.r-project.org" 
@@ -79,7 +91,8 @@ corpus.spanish <- corpus_subset(corpus.all, lang == "SPANISH")
 # Create DTMs
 ############################################
 myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.co",
-                 "iuglihzqy8", "4aimcj740l", "aswafbjtet", "tmjr7gwqze")
+                 "iuglihzqy8", "4aimcj740l", "aswafbjtet", "tmjr7gwqze", "http",
+                 "2cjzebhizv")
 dtm.english <- dfm(corpus.english, remove = c(stopwords("english"), myStopWords),
                    groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
                    removeNumbers = TRUE)

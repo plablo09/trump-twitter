@@ -81,9 +81,11 @@ for(f in fechas){
 }
 
 
-# Create corpus and subset them into spanish and english corpus
+# Create corpus, merge some phrases and subset
+# corpus into spanish and english
 ############################################
 corpus.all <- corpus(tuits, text_field = "Texto")
+
 corpus.english <- corpus_subset(corpus.all, lang == "ENGLISH")
 corpus.spanish <- corpus_subset(corpus.all, lang == "SPANISH")
 
@@ -92,14 +94,24 @@ corpus.spanish <- corpus_subset(corpus.all, lang == "SPANISH")
 ############################################
 myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.co",
                  "iuglihzqy8", "4aimcj740l", "aswafbjtet", "tmjr7gwqze", "http",
-                 "2cjzebhizv")
-dtm.english <- dfm(corpus.english, remove = c(stopwords("english"), myStopWords),
+                 "2cjzebhizv", "ijnve0xepy", "lktnlxvo2l")
+mergeWords <- dictionary(list(pena_nieto = c("peña nieto", "pena nieto"),
+                              hillary_clinton = c("hillary clinton")))
+dtm.english <- dfm(phrasetotoken(corpus.english, mergeWords),
+                   remove = c(stopwords("english"), myStopWords),
                    groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
-                   removeNumbers = TRUE)
+                   removeNumbers = TRUE,
+                   removeURL = TRUE,
+                   thesaurus = lapply(mergeWords, function(x) gsub("\\s", "_", x)))
+## junta <- dictionary(list(peña_nieto = c("PEÑA-NIETO", "PENA-NIETO"),
+##                          hillary_clinton = c("HILARY-CLINTON")))
+## dtm.english <- dfm_lookup(dtm.english, junta, exclusive = FALSE)
 dtm.spanish <- dfm(corpus.spanish, remove = c(stopwords("spanish"), myStopWords),
                    groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
-                   removeNumbers = TRUE)
-
+                   removeNumbers = TRUE,
+                   removeURL = TRUE,
+                   thesaurus = lapply(mergeWords, function(x) gsub("\\s", "_", x)))
+## dtm.spanish <- dfm_lookup(dtm.spanish, junta, exclusive = FALSE)
 
 # Filter words smaller than 4 chars
 ###########################################

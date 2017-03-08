@@ -77,6 +77,7 @@ filterByLength <- function(dtm, minSize){
 saveWordclouds <- function(dtm, maxWords, language, basePath){
     cont <- 1
     for(name in docnames(dtm)){
+        print(name)
         f.name <- paste(language, "wordcloud", name, sep = "_")
         f.name <- paste(f.name,"pdf", sep = ".")
         f.name <- paste(basePath, f.name, sep = "/")

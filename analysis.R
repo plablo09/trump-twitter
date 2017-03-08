@@ -95,23 +95,23 @@ corpus.spanish <- corpus_subset(corpus.all, lang == "SPANISH")
 myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.co",
                  "iuglihzqy8", "4aimcj740l", "aswafbjtet", "tmjr7gwqze", "http",
                  "2cjzebhizv", "ijnve0xepy", "lktnlxvo2l")
+
 mergeWords <- dictionary(list(pena_nieto = c("peña nieto", "pena nieto"),
                               hillary_clinton = c("hillary clinton")))
 dtm.english <- dfm(phrasetotoken(corpus.english, mergeWords),
                    remove = c(stopwords("english"), myStopWords),
-                   groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
+                   groups = "slice", removeURL = TRUE, removeTwitter = TRUE,
+                   removeSymbols = TRUE,
+                   removePunctuation = TRUE,
                    removeNumbers = TRUE,
-                   removeURL = TRUE,
                    thesaurus = lapply(mergeWords, function(x) gsub("\\s", "_", x)))
-## junta <- dictionary(list(peña_nieto = c("PEÑA-NIETO", "PENA-NIETO"),
-##                          hillary_clinton = c("HILARY-CLINTON")))
-## dtm.english <- dfm_lookup(dtm.english, junta, exclusive = FALSE)
+
 dtm.spanish <- dfm(corpus.spanish, remove = c(stopwords("spanish"), myStopWords),
-                   groups = "slice", removeSymbols = TRUE, removeTwitter = TRUE,
+                   groups = "slice", removeURL = TRUE, removeTwitter = TRUE,
+                   removeSymbols = TRUE,
+                   removePunctuation = TRUE,
                    removeNumbers = TRUE,
-                   removeURL = TRUE,
                    thesaurus = lapply(mergeWords, function(x) gsub("\\s", "_", x)))
-## dtm.spanish <- dfm_lookup(dtm.spanish, junta, exclusive = FALSE)
 
 # Filter words smaller than 4 chars
 ###########################################

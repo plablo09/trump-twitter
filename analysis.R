@@ -21,8 +21,9 @@ if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tm, topicmodels, dplyr, tidyr, igraph, devtools, LDAvis,
                ggplot2, parallel, rlist, ldatuning, magrittr, reshape,
                ggstance)
-# Install quanteda from my own fork. Maybe this will be a temporary workaround
-if (!require("quanteda")) install_github("plablo09/quanteda")
+# Install quanteda from github
+if (!require("quanteda")) install_github("kbenoit/quanteda")
+# Install language recognition library from archive
 if (!require("cldr",character.only = TRUE)){
     url <- "http://cran.us.r-project.org/src/contrib/Archive/cldr/cldr_1.1.0.tar.gz"
     pkgFile<-"cldr_1.1.0.tar.gz"
@@ -94,9 +95,6 @@ corpus.spanish <- corpus_subset(corpus.all, lang == "SPANISH")
 
 # Create DTMs
 ############################################
-## myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.co",
-##                  "iuglihzqy8", "4aimcj740l", "aswafbjtet", "tmjr7gwqze", "http",
-##                  "2cjzebhizv", "ijnve0xepy", "lktnlxvo2l")
 myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "https", "http")
 
 mergeWords <- dictionary(list(pena_nieto = c("peña nieto", "pena nieto"),

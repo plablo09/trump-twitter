@@ -19,8 +19,10 @@ local({r <- getOption("repos")
 # Install/load required packages
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tm, topicmodels, dplyr, tidyr, igraph, devtools, LDAvis,
-               ggplot2, quanteda, parallel, rlist, ldatuning, magrittr, reshape,
+               ggplot2, parallel, rlist, ldatuning, magrittr, reshape,
                ggstance)
+# Install quanteda from my own fork. Maybe this will be a temporary workaround
+if (!require("quanteda")) install_github("plablo09/quanteda")
 if (!require("cldr",character.only = TRUE)){
     url <- "http://cran.us.r-project.org/src/contrib/Archive/cldr/cldr_1.1.0.tar.gz"
     pkgFile<-"cldr_1.1.0.tar.gz"
@@ -92,9 +94,10 @@ corpus.spanish <- corpus_subset(corpus.all, lang == "SPANISH")
 
 # Create DTMs
 ############################################
-myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.co",
-                 "iuglihzqy8", "4aimcj740l", "aswafbjtet", "tmjr7gwqze", "http",
-                 "2cjzebhizv", "ijnve0xepy", "lktnlxvo2l")
+## myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "rt", "https", "t.co",
+##                  "iuglihzqy8", "4aimcj740l", "aswafbjtet", "tmjr7gwqze", "http",
+##                  "2cjzebhizv", "ijnve0xepy", "lktnlxvo2l")
+myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "https", "http")
 
 mergeWords <- dictionary(list(pena_nieto = c("peña nieto", "pena nieto"),
                               hillary_clinton = c("hillary clinton")))
@@ -102,14 +105,14 @@ dtm.english <- dfm(phrasetotoken(corpus.english, mergeWords),
                    remove = c(stopwords("english"), myStopWords),
                    groups = "slice", removeURL = TRUE, removeTwitter = TRUE,
                    removeSymbols = TRUE,
-                   removePunctuation = TRUE,
+                   removePunct = TRUE,
                    removeNumbers = TRUE,
                    thesaurus = lapply(mergeWords, function(x) gsub("\\s", "_", x)))
 
 dtm.spanish <- dfm(corpus.spanish, remove = c(stopwords("spanish"), myStopWords),
                    groups = "slice", removeURL = TRUE, removeTwitter = TRUE,
                    removeSymbols = TRUE,
-                   removePunctuation = TRUE,
+                   removePunct = TRUE,
                    removeNumbers = TRUE,
                    thesaurus = lapply(mergeWords, function(x) gsub("\\s", "_", x)))
 

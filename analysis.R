@@ -51,7 +51,6 @@ clusterExport(cl, cl_exports)
 # Read data, format dates and detect language
 ############################################
 print("Reading data")
-data_file <- "data/tuits_sample.csv"
 tuits <- read.csv(data_file, stringsAsFactors = FALSE)
 print("Parsing dates")
 tuits$Fecha_tweet <- parLapply(cl,tuits$Fecha_tweet, ftime)
@@ -147,7 +146,7 @@ result.spanish <- FindTopicsNumber(
   verbose = TRUE
 )
 save(result.spanish, file =  "data/ldatuning_result_spanish.RData")
-save(result, file =  "data/ldatuning_result_english.RData")
+save(result.english, file =  "data/ldatuning_result_english.RData")
 ## Get the optimal K value for each dtm
 ###########################################
 K.english <- getOptimalK(result.english)

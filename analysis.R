@@ -22,7 +22,7 @@ pacman::p_load(tm, topicmodels, dplyr, tidyr, igraph, devtools, LDAvis,
                ggplot2, parallel, rlist, ldatuning, magrittr, reshape,
                ggstance)
 # Install quanteda from github
-if (!require("quanteda")) install_github("kbenoit/quanteda")
+if (!require("quanteda")) p_load_gh("kbenoit/quanteda")
 # Install language recognition library from archive
 if (!require("cldr",character.only = TRUE)){
     url <- "http://cran.us.r-project.org/src/contrib/Archive/cldr/cldr_1.1.0.tar.gz"

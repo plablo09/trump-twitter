@@ -195,6 +195,7 @@ sp
 dev.off()
 
 jsonVis <- topicmodels2LDAvis(optimaLDA)
-
+# Save visualization
+LDAvis::serVis(jsonVis, out.dir = "vis", open.browser = FALSE)
 ## Serve visualization with:
 ## LDAvis::serVis(jsonVis)

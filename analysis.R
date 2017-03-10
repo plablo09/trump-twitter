@@ -86,6 +86,7 @@ for(f in fechas){
 # Create corpus, merge some phrases and subset
 # corpus into spanish and english
 ############################################
+print("Building corpora")
 corpus.all <- corpus(tuits, text_field = "Texto")
 
 corpus.english <- corpus_subset(corpus.all, lang == "ENGLISH")
@@ -94,6 +95,7 @@ corpus.spanish <- corpus_subset(corpus.all, lang == "SPANISH")
 
 # Create DTMs
 ############################################
+print("Creating DTMs")
 myStopWords <- c("trump", "donald", "realdonaldtrump", "amp", "https", "http")
 
 mergeWords <- dictionary(list(pena_nieto = c("peña nieto", "pena nieto"),
@@ -120,12 +122,14 @@ dtm.spanish <- filterByLength(dtm.spanish, 3)
 
 # Wordclouds
 ###########################################
+print("Saving wordclouds")
 set.seed(100)
 saveWordclouds(dtm.english, 150, "english", "img/")
 saveWordclouds(dtm.spanish, 150, "spanish", "img/")
 
 # Find optimal K for LDA topicmodel
 ##########################################
+print("Finding optimal K")
 control <- list(burnin = 500, iter = 1000, keep = 100, seed = 2500)
 result.english <- FindTopicsNumber(
   dtm.english,
@@ -151,7 +155,10 @@ save(result.english, file =  "data/ldatuning_result_english.RData")
 ###########################################
 K.english <- getOptimalK(result.english)
 K.spanish <- getOptimalK(result.spanish)
-
+print("Optimal K for english:")
+print(K.english)
+print("Optimal K for spanish:")
+print(K.spanish)
 ## Save metrics plots for both languages
 pdf("img/optimal-K-english.pdf")
 FindTopicsNumber_plot(result.english)
@@ -162,6 +169,7 @@ dev.off()
 
 # Fit models with found optimal Ks and save them
 ##########################################
+print("Fitting models with optimal Ks")
 lda.english <- LDA(dtm.english, K.english, method = "Gibbs", control = control)
 lda.spanish <- LDA(dtm.spanish, K.spanish, method = "Gibbs", control = control)
 save(lda.english, file = "data/lda.english.RData")
@@ -169,6 +177,7 @@ save(lda.spanish, file = "data/lda.spanish.RData")
 
 # Plot topic proportions per time slice
 ##########################################
+print("Plotting topic proportions distributions")
 t_levels <- c("2014-04-03", "2015-07-06", "2015-07-23", "2015-12-07", "2016-05-03",
                  "2016-07-18", "2016-07-25", "2016-08-26", "2016-08-31", "2016-09-01",
                  "2016-10-03", "2016-10-07", "2016-10-08", "2016-10-10", "2016-10-15",

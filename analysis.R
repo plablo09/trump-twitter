@@ -194,8 +194,10 @@ pdf("img/spanish_topic_proportions.pdf")
 sp
 dev.off()
 
-jsonVis <- topicmodels2LDAvis(optimaLDA)
+jsonVis.english <- topicmodels2LDAvis(lda.english)
+jsonVis.spanish <- topicmodels2LDAvis(lda.spanish)
 # Save visualization
-LDAvis::serVis(jsonVis, out.dir = "vis", open.browser = FALSE)
+LDAvis::serVis(jsonVis.english, out.dir = "vis/english", open.browser = FALSE)
+LDAvis::serVis(jsonVis.spanish, out.dir = "vis/spanish", open.browser = FALSE)
 ## Serve visualization with:
 ## LDAvis::serVis(jsonVis)

@@ -119,6 +119,8 @@ dtm.spanish <- dfm(corpus.spanish, remove = c(stopwords("spanish"), myStopWords)
 ###########################################
 dtm.english <- filterByLength(dtm.english, 3)
 dtm.spanish <- filterByLength(dtm.spanish, 3)
+save(dtm.spanish, file =  "data/dtm.spanish.RData")
+save(dtm.english, file =  "data/dtm.english.RData")
 
 # Wordclouds
 ###########################################
